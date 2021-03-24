@@ -77,10 +77,13 @@ class Trainer:
             done = False
             episode_return = 0.0
 
-            while (not done):
+            # while (not done):
+            for _ in range(1000):
                 action = self.algo.exploit(state)
                 state, reward, done, _ = self.env_test.step(action)
                 episode_return += reward
+                if done:
+                    break
 
             returns.append(episode_return)
 
