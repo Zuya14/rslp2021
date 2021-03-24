@@ -87,8 +87,10 @@ class sim:
             cos = action[1] / l
             sin = action[2] / l
 
-            self.vx = self.action[0] * cos
-            self.vy = self.action[0] * sin
+            v  = (self.action[0] + 1.0) * 0.5
+
+            self.vx = v * cos
+            self.vy = v * sin
 
             self.w = 0
 

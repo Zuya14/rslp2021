@@ -7,3 +7,8 @@ python train.py --env-name 'InvertedPendulumSwingupBulletEnv-v0' --collect-inter
 
 python train.py --collect-interval 10
 python train.py --collect-interval 10 --log-dir "log/02"
+python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/03"
+python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/04"
+python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/05"
+python train.py --collect-interval 10 --all-episodes 400 --log-dir "log/06" --seed-episodes 100
+python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/07"

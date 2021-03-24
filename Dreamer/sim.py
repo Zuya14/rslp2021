@@ -87,8 +87,10 @@ class sim:
             cos = action[1] / l
             sin = action[2] / l
 
-            self.vx = self.action[0] * cos
-            self.vy = self.action[0] * sin
+            v  = (self.action[0] + 1.0) * 0.5
+
+            self.vx = v * cos
+            self.vy = v * sin
 
             self.w = 0
 
@@ -119,7 +121,15 @@ class sim:
         self.scanDist = scanDist / bullet_lidar.maxLen
         self.scanDist = self.scanDist.astype(np.float32)
 
-        return self.scanDist
+        x, y = self.getState()[:2]
+
+        dx = 10.0 - x
+        dy = 10.0 - y
+
+        obs = self.scanDist
+        obs = np.append(obs, [dx, dy, self.vx, self.vy]).astype(np.float32)
+
+        return obs
 
     def render(self, bullet_lidar):
         pos, ori = self.getRobotPosInfo()

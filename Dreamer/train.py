@@ -152,7 +152,8 @@ def main():
 
             # 観測をエンコーダで低次元のベクトルに変換
             embedded_observations = encoder(
-                observations.reshape(-1, 30)).view(args.chunk_length, args.batch_size, -1)
+                # observations.reshape(-1, 30)).view(args.chunk_length, args.batch_size, -1)
+                observations.reshape(-1, 30+4)).view(args.chunk_length, args.batch_size, -1)
                 # observations.reshape(-1, 3, 64, 64)).view(args.chunk_length, args.batch_size, -1)
 
             # 低次元の状態表現を保持しておくためのTensorを定義

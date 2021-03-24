@@ -35,7 +35,8 @@ class mazeEnv(gym.Env):
 
         self.lidar = self.createLidar()
 
-        self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=self.lidar.shape)
+        # self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=self.lidar.shape)
+        self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(self.lidar.shape[0]+4,))
 
         self.sec = sec
         self.reset()
@@ -51,7 +52,8 @@ class mazeEnv(gym.Env):
 
         new_env.action_space = gym.spaces.Box(low=0.0, high=1.0, shape=(3,), dtype=np.float32)
         new_env.lidar = new_env.createLidar()
-        new_env.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=new_env.lidar.shape)
+        # new_env.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=new_env.lidar.shape)
+        new_env.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(new_env.lidar.shape[0]+4,))
 
         new_env.sec = self.sec
 
@@ -98,7 +100,7 @@ class mazeEnv(gym.Env):
 
         rewardArrive = 10.0 if isArrive else 0.0
 
-        rewardMove = 0.1 * (self.sim.old_distance - self.sim.distance)
+        rewardMove = 0.01 * (self.sim.old_distance - self.sim.distance)
         reward = rewardContact + rewardArrive + rewardMove
 
         return reward
