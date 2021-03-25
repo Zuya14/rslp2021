@@ -10,6 +10,9 @@ import lidar_util
 
 robot_name = "urdf/pla-robot.urdf"
 
+def onRect(pos, rec_s, rec_e):
+    return pos[0] >= rec_s[0] and pos[0] <= rec_e[0] and pos[1] >= rec_s[1] and pos[1] <= rec_e[1]
+
 class sim:
 
     def __init__(self, _id=0, mode=p.DIRECT, sec=0.01):
@@ -178,10 +181,114 @@ class sim:
     def isDone(self):
         return self.done
 
+class sim_cross(sim):
+
+    def loadBodys(self, x, y, theta):
+        self.robotPos = (x,y,0)
+        self.robotOri = p.getQuaternionFromEuler([0, 0, theta])
+
+        self.robotUniqueId = self.phisicsClient.loadURDF(
+            robot_name,
+            basePosition=self.robotPos,
+            baseOrientation = self.robotOri
+            )
+
+        for i in range(8):
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(i-1,  7, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  i, -1, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=( -1,i-1, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  7,  i, 0))]
+
+        for i in range(1,3):
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  3,   i, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  3, i+3, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  i,   3, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(i+3,   3, 0))]
+
+        self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(3, 3, 0))]
+
+    def reset(self, sec):
+        init_pos = np.random.rand(2) * 7
+
+        while onRect(init_pos, [1.0-0.25, 3.0-0.25], [6.0+0.25, 4.0+0.25]) or onRect(init_pos, [3.0-0.25, 1.0-0.25], [4.0+-0.25, 6.0+0.25]) :
+            init_pos = np.random.rand(2) * 7
+
+        super().reset(x=init_pos[0], y=init_pos[1], sec=sec)
+
+        tgt_pos = np.random.rand(2) * 6.5
+        tgt_pos = tgt_pos + 0.25 
+
+        while (onRect(tgt_pos, [1.0-0.25, 3.0-0.25], [6.0+0.25, 4.0+0.25]) or onRect(init_pos, [3.0-0.25, 1.0-0.25], [4.0+-0.25, 6.0+0.25])) and math.sqrt((init_pos[0] - tgt_pos[0])**2 + (init_pos[1] - tgt_pos[1])**2) > 1.0:
+                tgt_pos = np.random.rand(2) * 6.5
+                tgt_pos = tgt_pos + 0.25 
+
+        self.tgt_pos = tgt_pos
+
+        x, y = self.getState()[:2]
+        self.distance = math.sqrt((x - self.tgt_pos[0])**2 + (y - self.tgt_pos[1])**2)
+        self.old_distance = self.distance
+
+    def step(self, action):
+
+        self.old_distance = self.distance
+
+        if not self.done:
+            self.action = action
+
+            l = math.sqrt(action[1]**2 + action[2]**2)
+            cos = action[1] / l
+            sin = action[2] / l
+
+            v  = (self.action[0] + 1.0) * 0.5
+
+            self.vx = v * cos
+            self.vy = v * sin
+
+            self.w = 0
+
+            self.updateRobotInfo()
+
+            self.phisicsClient.stepSimulation()
+
+            if self.isContacts():
+                self.done = True
+
+            if self.isArrive():
+                self.done = True
+
+        else:
+            self.vx = 0
+            self.vy = 0
+            self.w = 0
+
+        x, y = self.getState()[:2]
+        self.distance = math.sqrt((x - self.tgt_pos[0])**2 + (y - self.tgt_pos[1])**2)
+
+        return self.done
+         
+
+    def observe(self, bullet_lidar):
+        pos, ori = self.getRobotPosInfo()
+        yaw = p.getEulerFromQuaternion(ori)[2]
+        scanDist = bullet_lidar.scanDistance(self.phisicsClient, pos, yaw, height=0.1)
+        self.scanDist = scanDist / bullet_lidar.maxLen
+        self.scanDist = self.scanDist.astype(np.float32)
+
+        x, y = self.getState()[:2]
+
+        dx = self.tgt_pos[0] - x
+        dy = self.tgt_pos[1] - y
+
+        obs = self.scanDist
+        obs = np.append(obs, [dx, dy, self.vx, self.vy]).astype(np.float32)
+
+        return obs
 if __name__ == '__main__':
 
     # sim = sim(0, mode=p.GUI, sec=0.001)
-    sim = sim(0, mode=p.DIRECT)
+    # sim = sim_cross(0, mode=p.GUI, sec=0.001)
+    # sim = sim(0, mode=p.DIRECT)
+    sim = sim_cross(0, mode=p.DIRECT, sec=0.001)
 
     from bullet_lidar import bullet_lidar
 

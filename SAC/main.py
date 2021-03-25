@@ -4,6 +4,7 @@ from SAC import SAC
 from trainer import Trainer
 
 from mazeEnv import mazeEnv 
+from crossEnv import crossEnv 
 
 # ENV_ID = 'InvertedPendulumBulletEnv-v0'
 SEED = 0
@@ -14,10 +15,12 @@ EVAL_INTERVAL = 10 ** 3
 # env = gym.make(ENV_ID)
 # env_test = gym.make(ENV_ID)
 
-env = mazeEnv()
+# env = mazeEnv()
+env = crossEnv()
 env.setting()
 
-env_test = mazeEnv()
+# env_test = mazeEnv()
+env_test = crossEnv()
 env_test.setting()
 
 algo = SAC(
