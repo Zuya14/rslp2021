@@ -130,3 +130,14 @@ class PPO(Algorithm):
         # 学習を安定させるヒューリスティックとして，勾配のノルムをクリッピングする．
         nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
         self.optim_actor.step()
+
+    def save(self, path="./"):
+        torch.save(self.actor.to('cpu').state_dict(), path+"actor.pth")
+        self.actor.to(self.device)
+
+        torch.save(self.critic.to('cpu').state_dict(), path+"critic.pth")
+        self.critic.to(self.device)
+
+    def load(self, path="./"):
+        self.actor.load_state_dict(torch.load(path+"actor.pth"))
+        self.critic.load_state_dict(torch.load(path+"critic.pth"))

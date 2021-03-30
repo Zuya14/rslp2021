@@ -40,7 +40,7 @@ class crossEnv(gym.Env):
 
         self.sec = sec
 
-        self._max_episode_steps = 1000
+        self._max_episode_steps = 100
 
         self.reset()
 
@@ -68,7 +68,8 @@ class crossEnv(gym.Env):
         return self.observe()
 
     def createLidar(self):
-        resolusion = 12
+        # resolusion = 12
+        resolusion = 36
         deg_offset = 90.
         rad_offset = deg_offset*(math.pi/180.0)
         startDeg = -180. + deg_offset

@@ -15,3 +15,5 @@ python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/07"
 
 
 python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/cross/01"
+
+python train.py --collect-interval 10 --all-episodes 5000 --log-dir "log/cross/03"

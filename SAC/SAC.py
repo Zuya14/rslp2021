@@ -128,3 +128,14 @@ class SAC(Algorithm):
         for t, s in zip(self.critic_target.parameters(), self.critic.parameters()):
             t.data.mul_(1.0 - self.tau)
             t.data.add_(self.tau * s.data)
+
+    def save(self, path="./"):
+        torch.save(self.actor.to('cpu').state_dict(), path+"actor.pth")
+        self.actor.to(self.device)
+
+        torch.save(self.critic.to('cpu').state_dict(), path+"critic.pth")
+        self.critic.to(self.device)
+
+    def load(self, path="./"):
+        self.actor.load_state_dict(torch.load(path+"actor.pth"))
+        self.critic.load_state_dict(torch.load(path+"critic.pth"))

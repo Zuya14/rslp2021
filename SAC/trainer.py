@@ -77,10 +77,13 @@ class Trainer:
             done = False
             episode_return = 0.0
 
-            while (not done):
+            # while (not done):
+            for _ in range(self.env_test._max_episode_steps):
                 action = self.algo.exploit(state)
                 state, reward, done, _ = self.env_test.step(action)
                 episode_return += reward
+                if done:
+                    break
 
             returns.append(episode_return)
 
@@ -121,3 +124,4 @@ class Trainer:
     def time(self):
         """ 学習開始からの経過時間． """
         return str(timedelta(seconds=int(time() - self.start_time)))
+        

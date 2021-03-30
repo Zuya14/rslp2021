@@ -120,7 +120,8 @@ def main():
         obs = env.reset()
         done = False
         total_reward = 0
-        while not done:
+        # while not done:          
+        for _ in range(env._max_episode_steps):
             # 探索のためにガウス分布に従うノイズを加える
             action = policy(obs) + np.random.normal(0, np.sqrt(args.action_noise_var), env.action_space.shape[0])
             action = np.clip(action, env.action_space.low, env.action_space.high)
@@ -128,6 +129,8 @@ def main():
             replay_buffer.push(obs, action, reward, done)
             obs = next_obs
             total_reward += reward
+            if done:
+                break
 
         # 訓練時の報酬と経過時間をログとして表示
         writer.add_scalar('total reward at train', total_reward, episode)
@@ -282,11 +285,13 @@ def main():
             obs = env.reset()
             done = False
             total_reward = 0
-            while not done:
+            # while not done:
+            for _ in range(env._max_episode_steps):
                 action = policy(obs, training=False).reshape(env.action_space.shape)
                 obs, reward, done, _ = env.step(action)
                 total_reward += reward
-
+                if done:
+                    break
             writer.add_scalar('total reward at test', total_reward, episode)
             print('Total test reward at episode [%4d/%4d] is %f' %
                     (episode+1, args.all_episodes, total_reward))
