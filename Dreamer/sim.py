@@ -176,10 +176,110 @@ class sim:
         return len(self.contacts()) > 0
 
     def isArrive(self):
-        return self.distance < 0.5
+        # return self.distance < 0.5
+        return self.distance < 0.1
 
     def isDone(self):
         return self.done
+
+class sim_maze3(sim):
+
+    def loadBodys(self, x, y, theta):
+        self.robotPos = (x,y,0)
+        self.robotOri = p.getQuaternionFromEuler([0, 0, theta])
+
+        self.robotUniqueId = self.phisicsClient.loadURDF(
+            robot_name,
+            basePosition=self.robotPos,
+            baseOrientation = self.robotOri
+            )
+
+        for i in range(4):
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(i-1,  3, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  i, -1, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=( -1,i-1, 0))]
+            self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  3,  i, 0))]
+
+        self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  1,  0, 0))]
+        self.bodyUniqueIds += [self.phisicsClient.loadURDF("urdf/wall.urdf", basePosition=(  1,  1, 0))]
+
+    def reset(self, sec):
+        init_pos = np.random.rand(2) * 2.5
+        init_pos = init_pos + 0.25 
+
+        while onRect(init_pos, [1.0-0.25, 2.0-0.25], [2.0+0.25, 2.0+0.25]):
+            init_pos = np.random.rand(2) * 2.5
+            init_pos = init_pos + 0.25 
+
+        super().reset(x=init_pos[0], y=init_pos[1], sec=sec)
+
+        tgt_pos = np.random.rand(2) * 2.5
+        tgt_pos = tgt_pos + 0.25 
+
+        while onRect(tgt_pos, [1.0-0.25, 2.0-0.25], [2.0+0.25, 2.0+0.25]) or math.sqrt((init_pos[0] - tgt_pos[0])**2 + (init_pos[1] - tgt_pos[1])**2) < 1.0:
+            tgt_pos = np.random.rand(2) * 2.5
+            tgt_pos = tgt_pos + 0.25 
+
+        self.tgt_pos = tgt_pos
+
+        x, y = self.getState()[:2]
+        self.distance = math.sqrt((x - self.tgt_pos[0])**2 + (y - self.tgt_pos[1])**2)
+        self.old_distance = self.distance
+
+    def step(self, action):
+
+        self.old_distance = self.distance
+
+        if not self.done:
+            self.action = action
+
+            l = math.sqrt(action[1]**2 + action[2]**2)
+            cos = action[1] / l
+            sin = action[2] / l
+
+            v  = (self.action[0] + 1.0) * 0.5
+
+            self.vx = v * cos
+            self.vy = v * sin
+
+            self.w = 0
+
+            self.updateRobotInfo()
+
+            self.phisicsClient.stepSimulation()
+
+            if self.isContacts():
+                self.done = True
+
+            if self.isArrive():
+                self.done = True
+
+        else:
+            self.vx = 0
+            self.vy = 0
+            self.w = 0
+
+        x, y = self.getState()[:2]
+        self.distance = math.sqrt((x - self.tgt_pos[0])**2 + (y - self.tgt_pos[1])**2)
+
+        return self.done
+
+    def observe(self, bullet_lidar):
+        pos, ori = self.getRobotPosInfo()
+        yaw = p.getEulerFromQuaternion(ori)[2]
+        scanDist = bullet_lidar.scanDistance(self.phisicsClient, pos, yaw, height=0.1)
+        self.scanDist = scanDist / bullet_lidar.maxLen
+        self.scanDist = self.scanDist.astype(np.float32)
+
+        x, y = self.getState()[:2]
+
+        dx = self.tgt_pos[0] - x
+        dy = self.tgt_pos[1] - y
+
+        obs = self.scanDist
+        obs = np.append(obs, [dx, dy, self.vx, self.vy]).astype(np.float32)
+
+        return obs
 
 class sim_square(sim):
 
