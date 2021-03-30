@@ -24,6 +24,7 @@ from wrappers import make_env
 import argparse
 from mazeEnv import mazeEnv 
 from crossEnv import crossEnv 
+from squareEnv import squareEnv 
 
 def main():
 
@@ -69,7 +70,8 @@ def main():
 
     # env = make_env(args.env_name)
     # env = mazeEnv()
-    env = crossEnv()
+    # env = crossEnv()
+    env = squareEnv()
     env.setting()
 
     replay_buffer = ReplayBuffer(capacity=args.buffer_capacity,

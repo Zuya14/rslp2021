@@ -103,7 +103,7 @@ class crossEnv(gym.Env):
 
         rewardArrive = 10.0 if isArrive else 0.0
 
-        rewardMove = 0.1 * (self.sim.old_distance - self.sim.distance)
+        rewardMove = 0.1 * (self.sim.old_distance - self.sim.distance) / self.sec
         reward = rewardContact + rewardArrive + rewardMove
 
         return reward
@@ -133,8 +133,8 @@ if __name__ == '__main__':
     while True:
         action = np.array([1.0, 1.0, 1.0])
 
-        env.step(action)
+        _, _, done, _ = env.step(action)
 
         cv2.imshow("env", env.render())
-        if cv2.waitKey(1) >= 0:
+        if done or cv2.waitKey(1) >= 0:
             break

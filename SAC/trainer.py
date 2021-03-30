@@ -77,10 +77,13 @@ class Trainer:
             done = False
             episode_return = 0.0
 
-            while (not done):
+            # while (not done):
+            for _ in range(self.env._max_episode_steps):
                 action = self.algo.exploit(state)
                 state, reward, done, _ = self.env_test.step(action)
                 episode_return += reward
+                if done:
+                    break
 
             returns.append(episode_return)
 
@@ -94,16 +97,20 @@ class Trainer:
 
     def visualize(self):
         """ 1エピソード環境を動かし，mp4を再生する． """
-        env = wrap_monitor(gym.make(self.env.unwrapped.spec.id))
+        # env = wrap_monitor(gym.make(self.env.unwrapped.spec.id))
         state = env.reset()
         done = False
+
+        env.render()
 
         while (not done):
             action = self.algo.exploit(state)
             state, _, done, _ = env.step(action)
 
+            env.render()
+
         del env
-        return play_mp4()
+        # return play_mp4()
 
     def plot(self):
         """ 平均収益のグラフを描画する． """

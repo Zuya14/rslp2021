@@ -78,7 +78,7 @@ class Trainer:
             episode_return = 0.0
 
             # while (not done):
-            for _ in range(1000):
+            for _ in range(self.env_test._max_episode_steps):
                 action = self.algo.exploit(state)
                 state, reward, done, _ = self.env_test.step(action)
                 episode_return += reward

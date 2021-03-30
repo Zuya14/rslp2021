@@ -16,7 +16,7 @@ import copy
 import bullet_lidar
 import sim  
 
-class mazeEnv(gym.Env):
+class crossEnv(gym.Env):
     global_id = 0
 
     def __init__(self):
@@ -26,10 +26,10 @@ class mazeEnv(gym.Env):
 
     def setting(self, _id=-1, mode=p.DIRECT, sec=0.1):
         if _id == -1:
-            self.sim = sim.sim(mazeEnv.global_id, mode, sec)
-            mazeEnv.global_id += 1
+            self.sim = sim.sim_cross(crossEnv.global_id, mode, sec)
+            crossEnv.global_id += 1
         else:
-            self.sim = sim.sim(_id, mode, sec)
+            self.sim = sim.sim_cross(_id, mode, sec)
 
         self.action_space = gym.spaces.Box(low=-1.0, high=1.0, shape=(3,), dtype=np.float32)
 
@@ -39,14 +39,17 @@ class mazeEnv(gym.Env):
         self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(self.lidar.shape[0]+4,))
 
         self.sec = sec
+
+        self._max_episode_steps = 1000
+
         self.reset()
 
     def copy(self, _id=-1):
-        new_env = mazeEnv()
+        new_env = crossEnv()
         
         if _id == -1:
-            new_env.sim = self.sim.copy(mazeEnv.global_id)
-            mazeEnv.global_id += 1
+            new_env.sim = self.sim.copy(crossEnv.global_id)
+            crossEnv.global_id += 1
         else:
             new_env.sim = self.sim.copy(_id)
 
@@ -59,9 +62,9 @@ class mazeEnv(gym.Env):
 
         return new_env
 
-    def reset(self, x=1.0, y=1.0, theta=0.0, vx=0.0, vy=0.0, w=0.0, dynamic_counter=0.0, interval=3.0, action=None, clientReset=False):
+    def reset(self):
         assert self.sim is not None, print("call setting!!") 
-        self.sim.reset(x=x, y=y, theta=theta, vx=vx, vy=vy, w=w, sec=self.sec, action=action, clientReset=clientReset)
+        self.sim.reset(sec=self.sec)
         return self.observe()
 
     def createLidar(self):
@@ -98,7 +101,7 @@ class mazeEnv(gym.Env):
 
         rewardContact = -1.0 if isComtact else 0.0
 
-        rewardArrive = 10.0 if isArrive else 0.0
+        rewardArrive = 1.0 if isArrive else 0.0
 
         rewardMove = 0.01 * (self.sim.old_distance - self.sim.distance) / self.sec
         reward = rewardContact + rewardArrive + rewardMove
@@ -124,14 +127,14 @@ class mazeEnv(gym.Env):
 
 if __name__ == '__main__':
     
-    env = mazeEnv()
+    env = crossEnv()
     env.setting()
 
     while True:
         action = np.array([1.0, 1.0, 1.0])
 
-        env.step(action)
+        _, _, done, _ = env.step(action)
 
         cv2.imshow("env", env.render())
-        if cv2.waitKey(1) >= 0:
+        if done or cv2.waitKey(1) >= 0:
             break

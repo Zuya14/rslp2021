@@ -5,11 +5,13 @@ from trainer import Trainer
 
 from mazeEnv import mazeEnv 
 from crossEnv import crossEnv 
+from squareEnv import squareEnv 
 
 # ENV_ID = 'InvertedPendulumBulletEnv-v0'
 SEED = 0
 REWARD_SCALE = 1.0
-NUM_STEPS = 5 * 10 ** 4
+# NUM_STEPS = 5 * 10 ** 4
+NUM_STEPS = 10 * 10 ** 4
 EVAL_INTERVAL = 10 ** 3
 
 # env = gym.make(ENV_ID)
@@ -17,10 +19,12 @@ EVAL_INTERVAL = 10 ** 3
 
 # env = mazeEnv()
 env = crossEnv()
+# env = squareEnv()
 env.setting()
 
 # env_test = mazeEnv()
 env_test = crossEnv()
+# env_test = squareEnv()
 env_test.setting()
 
 algo = SAC(
