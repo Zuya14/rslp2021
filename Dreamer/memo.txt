@@ -17,3 +17,9 @@ python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/07"
 python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/cross/01"
 
 python train.py --collect-interval 10 --all-episodes 5000 --log-dir "log/cross/03"
+
+python train.py --collect-interval 10 --all-episodes 300 --log-dir "log/square/01"
+python train.py --collect-interval 10 --all-episodes 100 --log-dir "log/square/02"
+
+python train.py --collect-interval 10 --all-episodes 1000 --log-dir "log/maze3/01"
+

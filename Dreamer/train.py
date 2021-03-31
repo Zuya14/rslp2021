@@ -24,6 +24,11 @@ from wrappers import make_env
 import argparse
 from mazeEnv import mazeEnv 
 from crossEnv import crossEnv 
+from squareEnv import squareEnv 
+from maze3Env import maze3Env 
+
+# l_num = 10
+l_num = 360
 
 def main():
 
@@ -69,7 +74,9 @@ def main():
 
     # env = make_env(args.env_name)
     # env = mazeEnv()
-    env = crossEnv()
+    # env = crossEnv()
+    env = squareEnv()
+    # env = maze3Env()
     env.setting()
 
     replay_buffer = ReplayBuffer(capacity=args.buffer_capacity,
@@ -158,7 +165,7 @@ def main():
             # 観測をエンコーダで低次元のベクトルに変換
             embedded_observations = encoder(
                 # observations.reshape(-1, 30)).view(args.chunk_length, args.batch_size, -1)
-                observations.reshape(-1, 30+4)).view(args.chunk_length, args.batch_size, -1)
+                observations.reshape(-1, l_num+4)).view(args.chunk_length, args.batch_size, -1)
                 # observations.reshape(-1, 3, 64, 64)).view(args.chunk_length, args.batch_size, -1)
 
             # 低次元の状態表現を保持しておくためのTensorを定義
@@ -282,7 +289,8 @@ def main():
         if (episode + 1) % args.test_interval == 0:
             policy = Agent(encoder, rssm, action_model)
             start = time.time()
-            obs = env.reset()
+            # obs = env.reset()
+            obs = env.test_reset()
             done = False
             total_reward = 0
             # while not done:

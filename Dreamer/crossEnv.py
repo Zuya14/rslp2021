@@ -40,7 +40,7 @@ class crossEnv(gym.Env):
 
         self.sec = sec
 
-        self._max_episode_steps = 1000
+        self._max_episode_steps = 100
 
         self.reset()
 
@@ -68,14 +68,14 @@ class crossEnv(gym.Env):
         return self.observe()
 
     def createLidar(self):
-        resolusion = 12
+        # resolusion = 12
+        resolusion = 36
         deg_offset = 90.
         rad_offset = deg_offset*(math.pi/180.0)
         startDeg = -180. + deg_offset
         endDeg = 180. + deg_offset
 
-        # maxLen = 20.
-        maxLen = 10.
+        maxLen = 20.
         minLen = 0.
         return bullet_lidar.bullet_lidar(startDeg, endDeg, resolusion, maxLen, minLen)
 
@@ -104,7 +104,7 @@ class crossEnv(gym.Env):
 
         rewardArrive = 10.0 if isArrive else 0.0
 
-        rewardMove = 0.1 * (self.sim.old_distance - self.sim.distance)
+        rewardMove = 0.1 * (self.sim.old_distance - self.sim.distance) / self.sec
         reward = rewardContact + rewardArrive + rewardMove
 
         return reward
@@ -134,8 +134,8 @@ if __name__ == '__main__':
     while True:
         action = np.array([1.0, 1.0, 1.0])
 
-        env.step(action)
+        _, _, done, _ = env.step(action)
 
         cv2.imshow("env", env.render())
-        if cv2.waitKey(1) >= 0:
+        if done or cv2.waitKey(1) >= 0:
             break

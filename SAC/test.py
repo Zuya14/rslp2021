@@ -11,9 +11,9 @@ from maze3Env import maze3Env
 # ENV_ID = 'InvertedPendulumBulletEnv-v0'
 SEED = 0
 REWARD_SCALE = 1.0
-NUM_STEPS = 5 * 10 ** 4
+# NUM_STEPS = 5 * 10 ** 4
 # NUM_STEPS = 10 * 10 ** 4
-# NUM_STEPS = 2 * 10 ** 5
+NUM_STEPS = 2 * 10 ** 5
 EVAL_INTERVAL = 10 ** 3
 
 # env = gym.make(ENV_ID)
@@ -47,10 +47,6 @@ trainer = Trainer(
     eval_interval=EVAL_INTERVAL,
 )
 
-trainer.train()
+algo.load()
 
-trainer.plot()
-
-algo.save()
-
-# trainer.visualize()
+trainer.saveVideo()

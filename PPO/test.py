@@ -1,6 +1,6 @@
 import gym
 import pybullet_envs
-from SAC import SAC
+from PPO import PPO
 from trainer import Trainer
 
 from mazeEnv import mazeEnv 
@@ -10,10 +10,10 @@ from maze3Env import maze3Env
 
 # ENV_ID = 'InvertedPendulumBulletEnv-v0'
 SEED = 0
-REWARD_SCALE = 1.0
-NUM_STEPS = 5 * 10 ** 4
+# NUM_STEPS = 5 * 10 ** 4
 # NUM_STEPS = 10 * 10 ** 4
-# NUM_STEPS = 2 * 10 ** 5
+NUM_STEPS = 2 * 10 ** 5
+# NUM_STEPS = 25 * 10 ** 4
 EVAL_INTERVAL = 10 ** 3
 
 # env = gym.make(ENV_ID)
@@ -31,11 +31,10 @@ env.setting()
 env_test = maze3Env()
 env_test.setting()
 
-algo = SAC(
+algo = PPO(
     state_shape=env.observation_space.shape,
     action_shape=env.action_space.shape,
-    seed=SEED,
-    reward_scale=REWARD_SCALE,
+    seed=SEED
 )
 
 trainer = Trainer(
@@ -47,10 +46,6 @@ trainer = Trainer(
     eval_interval=EVAL_INTERVAL,
 )
 
-trainer.train()
+algo.load()
 
-trainer.plot()
-
-algo.save()
-
-# trainer.visualize()
+trainer.saveVideo()

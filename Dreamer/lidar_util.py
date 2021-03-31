@@ -66,6 +66,33 @@ def imshowLocal(name, h, w, points, maxLen, point_color=(0,0,255), line_color=(2
 
     return img
 
+def imshowTgt(name, h, w, points, maxLen, point_color=(0, 255, 0), preimg=None, show=True):
+
+    img = np.zeros((h, w, 3), np.uint8) if preimg is None else preimg
+    center = (w//2, h//2)
+
+    if preimg is None:
+        cv2.line(img, (0, center[1]), (w, center[1]), color=(255,255,255), thickness=1, lineType=cv2.LINE_8, shift=0)
+        cv2.line(img, (center[0], 0), (center[0], h), color=(255,255,255), thickness=1, lineType=cv2.LINE_8, shift=0)
+
+    pts = np.zeros((points.shape[0], 2))
+
+    k = center[0] if w<h else center[1]
+
+    for a, b in zip(pts, points):
+        a[0] =  b[0] * (k/maxLen)
+        a[1] = -b[1] * (k/maxLen)
+
+    pts += center
+
+    for p in pts.astype(np.int64):
+        cv2.circle(img, tuple(p), radius=1, color=point_color, thickness=-2, lineType=cv2.LINE_8, shift=0)
+
+    if show:
+        cv2.imshow(name, img)
+
+    return img
+
 def imshowCircle(name, h, w, l, maxLen, color=(0,0,255), preimg=None, show=True):
 
     img = np.zeros((h, w, 3), np.uint8) if preimg is None else preimg

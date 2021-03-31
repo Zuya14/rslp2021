@@ -4,6 +4,8 @@ from torch import nn
 from torch.nn import functional as F
 from torch.distributions import Normal
 
+# l_num = 10
+l_num = 360
 
 class Encoder(nn.Module):
     """
@@ -18,7 +20,7 @@ class Encoder(nn.Module):
         # self.cv3 = nn.Conv2d(64, 128, kernel_size=4, stride=2)
         # self.cv4 = nn.Conv2d(128, 256, kernel_size=4, stride=2)
 
-        self.fc1 = nn.Linear(30 + 4, 1024)
+        self.fc1 = nn.Linear(l_num + 4, 1024)
         self.fc2 = nn.Linear(1024, 1024)
         self.fc3 = nn.Linear(1024, 1024)
 
@@ -130,7 +132,7 @@ class ObservationModel(nn.Module):
 
         self.fc1 = nn.Linear(state_dim + rnn_hidden_dim, 1024)
         self.fc2 = nn.Linear(1024, 1024)
-        self.fc3 = nn.Linear(1024, 30 + 4)
+        self.fc3 = nn.Linear(1024, l_num + 4)
 
     def forward(self, state, rnn_hidden):
         # hidden = self.fc(torch.cat([state, rnn_hidden], dim=1))

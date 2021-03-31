@@ -101,7 +101,7 @@ class mazeEnv(gym.Env):
 
         rewardArrive = 10.0 if isArrive else 0.0
 
-        rewardMove = 0.1 * (self.sim.old_distance - self.sim.distance)
+        rewardMove = 0.1 * (self.sim.old_distance - self.sim.distance) / self.sec
         reward = rewardContact + rewardArrive + rewardMove
 
         return reward

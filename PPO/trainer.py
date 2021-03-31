@@ -7,7 +7,7 @@ import numpy as np
 import gym
 import matplotlib.pyplot as plt
 # from IPython.display import HTML
-
+import cv2
 
 def wrap_monitor(env):
     """ Gymの環境をmp4に保存するために，環境をラップする関数． """
@@ -73,7 +73,8 @@ class Trainer:
 
         returns = []
         for _ in range(self.num_eval_episodes):
-            state = self.env_test.reset()
+            # state = self.env_test.reset()
+            state = self.env_test.test_reset()
             done = False
             episode_return = 0.0
 
@@ -124,3 +125,19 @@ class Trainer:
     def time(self):
         """ 学習開始からの経過時間． """
         return str(timedelta(seconds=int(time() - self.start_time)))
+
+    def saveVideo(self, path="./"):   
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')  
+        video = cv2.VideoWriter(path+"test.mp4", fourcc, 10, (800,800))  # 動画の仕様（ファイル名、fourcc, FPS, サイズ）
+
+        done = False
+        state = self.env.test_reset()
+
+        video.write(self.env.render())
+
+        for _ in range(self.env._max_episode_steps):
+            action = self.algo.exploit(state)
+            state, _, done, _ = self.env.step(action)
+            video.write(self.env.render())
+            if done:
+                break
