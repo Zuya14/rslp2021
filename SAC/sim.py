@@ -254,7 +254,8 @@ class sim_maze3(sim):
         self.old_distance = self.distance
 
     def test_reset(self, sec):
-        init_pos = np.array([1.0, 1.0])
+        # init_pos = np.array([1.0, 1.0])
+        init_pos = np.array([8.0, 8.0])
 
         super().reset(x=init_pos[0], y=init_pos[1], sec=sec)
 
@@ -263,6 +264,19 @@ class sim_maze3(sim):
         x, y = self.getState()[:2]
         self.distance = math.sqrt((x - self.tgt_pos[0])**2 + (y - self.tgt_pos[1])**2)
         self.old_distance = self.distance
+
+    def test_reset2(self, sec, sx, sy, gx, gy):
+        # init_pos = np.array([1.0, 1.0])
+        init_pos = np.array([sx, sy])
+
+        super().reset(x=init_pos[0], y=init_pos[1], sec=sec)
+
+        self.tgt_pos = np.array([gx, gy])
+
+        x, y = self.getState()[:2]
+        self.distance = math.sqrt((x - self.tgt_pos[0])**2 + (y - self.tgt_pos[1])**2)
+        self.old_distance = self.distance
+
 
     def step(self, action):
 
@@ -542,7 +556,8 @@ if __name__ == '__main__':
     # sim = sim_cross(0, mode=p.GUI, sec=0.001)
     # sim = sim(0, mode=p.DIRECT)
     # sim = sim_cross(0, mode=p.DIRECT, sec=0.001)
-    sim = sim_maze3(0, mode=p.GUI, sec=0.001)
+    # sim = sim_maze3(0, mode=p.GUI, sec=0.001)
+    sim = sim_square(0, mode=p.GUI, sec=0.001)
 
     from bullet_lidar import bullet_lidar
 
@@ -559,7 +574,7 @@ if __name__ == '__main__':
         # action = np.array([0.5, 0.5, 1])
         action = np.random.rand(3)
 
-        sim.step(action=action)
+        # sim.step(action=action)
 
         # print(np.concatenate([action, sim.action]))
 
