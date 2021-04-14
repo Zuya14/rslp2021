@@ -52,8 +52,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # xs = np.arange(0.0, 9.0+1e-6, 1.0)
 # ys = np.arange(0.0, 9.0+1e-6, 1.0)
 
-xs = np.arange(0.0-3.0, 9.0+1e-6+3.0, 0.5)
-ys = np.arange(0.0-3.0, 9.0+1e-6+3.0, 0.5)
+# xs = np.arange(0.0-3.0, 9.0+1e-6+3.0, 0.5)
+# ys = np.arange(0.0-3.0, 9.0+1e-6+3.0, 0.5)
+
+xs = np.arange(0.0-20.0, 9.0+1e-6+20.0, 1.0)
+ys = np.arange(0.0-20.0, 9.0+1e-6+20.0, 1.0)
 
 print(xs, ys)
 
@@ -61,8 +64,8 @@ data = np.zeros((len(xs), len(ys)))
 
 j = 0
 
-sx = 8.0
-sy = 7.5
+sx = 1.0
+sy = 1.0
 
 def draw_heatmap(data, row_labels, column_labels):
     # 描画する
@@ -71,13 +74,13 @@ def draw_heatmap(data, row_labels, column_labels):
 
     ax.set_xticks(np.arange(data.shape[0]) + 0.5, minor=False)
     ax.set_yticks(np.arange(data.shape[1]) + 0.5, minor=False)
-
+    ax.set_aspect('equal', adjustable='box')
     # ax.invert_yaxis()
     # ax.xaxis.tick_top()
 
     ax.set_xticklabels(row_labels, minor=False)
     ax.set_yticklabels(column_labels, minor=False)
-    plt.savefig('image{}_{}_ex.png'.format(sx, sy))
+    plt.savefig('image{}_{}_ex2.png'.format(sx, sy))
     plt.show()
 
     return heatmap
